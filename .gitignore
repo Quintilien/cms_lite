@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+
+# Per-installation configuration (the *.example templates are tracked)
+config/config.ini
+compose.yml
+Caddyfile
+admin/.htaccess
+
+# Production databases: only the demo database is tracked
+data/*.db
+!data/cms_lite_demo.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# Files uploaded from the editor
+public/images/uploads/*
+!public/images/uploads/index.html
+public/files/*
+!public/files/index.html
+
+# Activated options (copied from options/, see their README): per installation
+public/doclist.php
+public/display*.php
+public/Documents/
+public/extdb.php
+src/doclist_lib.php
+
+# Backups
+*.bak*
+
+# Editor build
+admin/editor-src/node_modules/

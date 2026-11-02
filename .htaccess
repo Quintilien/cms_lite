@@ -1,0 +1,11 @@
+# CMS Lite 4 — safety net, for Apache only.
+#
+# The web root must be the public/ folder (see README, "Installing"). This file
+# only matters if the whole repository was dropped as is into a web root: it
+# then prevents downloading the databases, the configuration and the code, and
+# reaching the editor unprotected. It does not replace the proper layout, and
+# has no effect on nginx, Caddy or any server that ignores .htaccess.
+
+RedirectMatch 404 (?i)/(admin|config|data|init|options|php|src|vendor)(/|$)
+RedirectMatch 404 (?i)/(composer\.(json|lock)|README(\.fr)?\.md|LICENSE|VERSION|Caddyfile[^/]*|compose[^/]*\.yml)$
+RedirectMatch 404 /\.(git|gitignore|htaccess)

@@ -1,0 +1,19 @@
+# Local trial (compose.local.yml): plain HTTP, no certificate.
+{
+	auto_https off
+}
+
+# The site
+:8081 {
+	reverse_proxy cmslite-public:80
+}
+
+# The editor, password-protected as in production (Tinyauth).
+# Trial account: secretaire / essai-cms-lite
+# Another password: docker run --rm caddy:2 caddy hash-password --plaintext 'the-password'
+:8082 {
+	basic_auth {
+		secretaire $2a$12$Qn/8OPBFTAKy4ICxH77AweajH/kxE8GvEsmxIccmuBrrcuXsx/8r6
+	}
+	reverse_proxy cmslite-admin:80
+}

@@ -1,0 +1,69 @@
+# ============================================================
+# CMS Lite 4 — blocks to add to the VPS's Caddyfile (Caddy installed on the
+# system, outside Docker). Replace the domain names.
+# ============================================================
+
+# ------------------------------------------------------------
+# Optional: security headers recommended by OWASP (Secure Headers Project),
+# in addition to those CMS Lite sets itself. Import them in the blocks below
+# ("import security_headers"), and in those of other sites.
+# ------------------------------------------------------------
+(security_headers) {
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "same-origin"
+        -Server
+    }
+}
+
+# ------------------------------------------------------------
+# The site (container cmslite-public: 127.0.0.1:8090)
+# ------------------------------------------------------------
+site.example.org {
+    import security_headers
+    reverse_proxy 127.0.0.1:8090
+}
+
+# Variant: restricted-access site (forward-auth, e.g. Tinyauth).
+# The font stays outside authentication: the editor (another host) loads it
+# without a cookie (CORS request), and forward-auth would refuse it.
+#
+# site.example.org {
+#     @fonts path /css/fonts/*
+#     handle @fonts {
+#         reverse_proxy 127.0.0.1:8090
+#     }
+#     handle {
+#         forward_auth 127.0.0.1:3000 {
+#             uri /api/auth/caddy
+#         }
+#         reverse_proxy 127.0.0.1:8090
+#     }
+# }
+
+# ------------------------------------------------------------
+# The editor (container cmslite-admin: 127.0.0.1:8091)
+# PROTECTION REQUIRED: the editor has no password of its own.
+# Choose ONE of the two variants.
+# ------------------------------------------------------------
+
+# Variant 1: forward-auth (Tinyauth, Authelia…) — limited attempts,
+# login page, one account for several services.
+admin.example.org {
+    import security_headers
+    forward_auth 127.0.0.1:3000 {      # Tinyauth's address
+        uri /api/auth/caddy             # Tinyauth; Authelia: /api/authz/forward-auth
+    }
+    reverse_proxy 127.0.0.1:8091
+}
+
+# Variant 2: Caddy's built-in Basic authentication (hash produced by
+#   caddy hash-password). Caddy 2.8+: basic_auth; before: basicauth.
+#
+# admin.example.org {
+#     basic_auth {
+#         secretaire <bcrypt hash>
+#     }
+#     reverse_proxy 127.0.0.1:8091
+# }

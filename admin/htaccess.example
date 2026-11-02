@@ -1,0 +1,24 @@
+# Protecting the editor on Apache hosting: REQUIRED (see README, "Protecting the editor").
+# 1. Rename this file to .htaccess (in the admin/ folder copied into the web root).
+# 2. Create the password file OUTSIDE the web root:
+#       htpasswd -c -B /home/LOGIN/.htpasswd-admin secretaire
+#    (or an online bcrypt generator if there is no SSH access)
+# 3. Adjust AuthUserFile below (absolute path on the server).
+# HTTPS only: over HTTP, the password travels in clear text.
+
+AuthType Basic
+AuthName "CMS Lite editor"
+AuthUserFile /home/LOGIN/.htpasswd-admin
+Require valid-user
+
+# The editor's sources have no business being online
+RedirectMatch 404 /editor-src/
+
+# Attachments up to 100 MB (short videos, audio) — if the host allows
+# php_value; otherwise, the same settings in a .user.ini file next to it
+<IfModule mod_php.c>
+  php_value upload_max_filesize 100M
+  php_value post_max_size 110M
+  php_value max_input_time 300
+  php_value memory_limit 256M
+</IfModule>

@@ -1,0 +1,53 @@
+# CMS Lite 4 — production on a VPS. Two PHP + Apache containers (same image):
+#   public: the site, database read-only, cannot write anything     -> 127.0.0.1:8090
+#   admin : the editor, writes the database, images, attachments    -> 127.0.0.1:8091
+# The VPS's Caddy reaches them with reverse_proxy; nothing is exposed to the Internet.
+#
+# Getting started:
+#   cp compose.example.yml compose.yml            (compose.yml is ignored by Git)
+#   cp config/config.ini.example config/config.ini   (config.ini is ignored by Git)
+#   then set CMS_PUBLIC_URL below, and the "db" key in config/config.ini.
+# BOTH containers use the database named in config/config.ini.
+# 4.4.0: only public/ is served; src/, config/, vendor/ and data/ are mounted
+# next to it (/var/www/…), outside the web root, as on classic hosting.
+# Check that the ports are free:  ss -ltn | grep -E ':809[01]\b'
+
+services:
+  cmslite-public:
+    build: ./php
+    container_name: cmslite-public
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:80"
+    volumes:
+      - ./public:/var/www/html:ro
+      - ./src:/var/www/src:ro
+      - ./config:/var/www/config:ro
+      - ./vendor:/var/www/vendor:ro
+      - ./data:/var/www/data:ro
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  cmslite-admin:
+    build: ./php
+    container_name: cmslite-admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8091:80"
+    environment:
+      CMS_WWW: /var/www/site
+      CMS_PUBLIC_URL: https://site.example.org   # full address of the public site
+    volumes:
+      - ./admin:/var/www/html:ro
+      - ./public:/var/www/site        # write: public/images/uploads, public/files
+      - ./src:/var/www/src:ro         # reads config.ini, shared with the site (4.5.0)
+      - ./config:/var/www/config:ro   # config.ini: which database to use
+      - ./data:/var/www/data          # write: the database (and its journal, hence the directory)
+    deploy:
+      resources:
+        limits:
+          memory: 256M                # resizing a 12 MB photo fits easily
+          cpus: '0.5'

@@ -1,0 +1,43 @@
+# CMS Lite 4 — local trial with Docker (Mac, Windows, Linux), nothing else needed.
+#   docker compose -f compose.local.yml up -d --build
+#   site  : http://localhost:8081
+#   admin : http://localhost:8082   (secretaire / essai-cms-lite)
+# Same containers as in production (PHP + Apache), with a Caddy in front
+# playing the part of the VPS's Caddy (the password stands in for Tinyauth).
+# The ports are only open on the machine itself (127.0.0.1).
+
+name: cms-lite-4
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:8082:8082"
+    volumes:
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
+    depends_on: [cmslite-public, cmslite-admin]
+
+  cmslite-public:
+    build: ./php
+    restart: unless-stopped
+    volumes:
+      - ./public:/var/www/html:ro
+      - ./src:/var/www/src:ro
+      - ./config:/var/www/config:ro
+      - ./vendor:/var/www/vendor:ro
+      - ./data:/var/www/data:ro
+
+  cmslite-admin:
+    build: ./php
+    restart: unless-stopped
+    environment:
+      CMS_WWW: /var/www/site
+      CMS_PUBLIC_URL: http://localhost:8081
+    volumes:
+      - ./admin:/var/www/html:ro
+      - ./public:/var/www/site
+      - ./src:/var/www/src:ro         # reads config.ini, shared with the site (4.5.0)
+      - ./config:/var/www/config:ro
+      - ./data:/var/www/data

@@ -1,0 +1,330 @@
+/* ==========================================================================
+   CMS Lite 4 — site.css
+   On its own, replaces style.css, nav.css and editor.css.
+   Same HTML markup as before (HEADER / BODY / FOOTER parameters, nav.php,
+   t_conversion, editor): changing HTML_META_CSS is enough.
+
+   Principles:
+   - a single typeface, Inter, hosted on the site (no call to Google Fonts):
+     identical rendering on Mac, Windows, Linux, iPhone, Android;
+   - headings matched to Docmost's custom.css (same blue, same weight,
+     same sizes): the site and the wiki look alike;
+   - units relative to the text size chosen by the visitor;
+   - a grid (half, third, two thirds) that stacks on phones;
+   - a single breakpoint: 700 px;
+   - automatic dark mode, following the visitor's system setting.
+   ========================================================================== */
+
+
+/* --- 1. Settings ------------------------------------------------------- */
+
+:root {
+  /* Each colour: light-dark(light value, dark value). The browser picks one
+     according to color-scheme, i.e. by default the system setting. */
+  color-scheme: light dark;
+  --bg:         light-dark(#fff,    #16191d);
+  --ink:        light-dark(#222,    #e4e7eb);
+  --muted:      light-dark(#6b7280, #9aa4ae);
+  --brand:      light-dark(#3d5c7a, rgb(168, 196, 226));   /* CMS Lite blue / Docmost's dark tint */
+  --brand-soft: light-dark(#7590ae, rgb(200, 220, 240));
+  --wash:       light-dark(#f3f6f9, #21262c);
+  --rule:       light-dark(#dde3ea, #343c46);
+  --shadow:     light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.4));
+  --measure:    60rem;            /* usable page width: 960 px */
+  --gap:        4%;               /* gap between columns */
+}
+/* Forced mode (used by the editor; the public site stays automatic) */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/* Photos and logos slightly dimmed in dark mode: less glare */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) img:not([src$=".svg"]) { filter: brightness(0.92); }
+}
+:root[data-theme="dark"] img:not([src$=".svg"]) { filter: brightness(0.92); }
+
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/inter-italic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+
+/* --- 2. Base ----------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-size: 100%;                           /* respects the visitor's setting */
+  -webkit-text-size-adjust: 100%;            /* iPhone: no arbitrary enlargement */
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;                           /* 16 px: Inter is wide, no need to enlarge */
+  line-height: 1.6;
+  font-feature-settings: "liga", "kern";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  color: var(--ink);
+  background: var(--bg);
+  overflow-wrap: break-word;                 /* long addresses: no overflow */
+}
+
+.container { width: 100%; }
+.container-960px {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+
+/* --- 3. Text ----------------------------------------------------------- */
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--brand);
+  font-weight: 400;
+  margin: 0 0 0.5em;
+}
+/* Same values as Docmost's custom.css — large screen */
+h1 { font-size: 2.2rem;  line-height: 1.25; letter-spacing: -0.04rem; margin-top: 0.5em; }
+h2 { font-size: 1.9rem;  line-height: 1.3;  letter-spacing: -0.03rem; margin-top: 1.6em; }
+h3 { font-size: 1.6rem;  line-height: 1.35; letter-spacing: -0.02rem; margin-top: 1.4em; }
+h4 { font-size: 1.35rem; line-height: 1.45; margin-top: 1.3em; }
+h5, h6 { font-size: 1.15rem; line-height: 1.5; margin-top: 1.2em; }
+/* heading directly after another heading ("Welcome" then "Overview"):
+   the large margin separates a heading from the TEXT before it, not from another heading */
+:is(h1, h2, h3, h4, h5, h6) + :is(h2, h3, h4, h5, h6) { margin-top: 0.4em; }
+/* a heading at the top of a block has no top margin */
+.ed-page > :first-child, .column > :first-child, .ProseMirror > :first-child { margin-top: 0; }
+
+p, ul, ol, blockquote, pre, table, figure { margin: 0 0 1em; }
+ul, ol { padding-left: 1.5em; }
+li { margin-bottom: 0.25em; }
+li > p { margin: 0; }                      /* the editor puts list item text in a <p> */
+li > ul, li > ol { margin: 0.25em 0 0; }
+
+/* Comfortable line length (about 80 characters) for running text.
+   Only affects full-width text: columns, images, tables and headings
+   keep the full page width. */
+.ed-page > :is(p, ul, ol, blockquote),
+.ProseMirror > :is(p, ul, ol, blockquote),
+.container-960px > :is(p, ul, ol, blockquote) { max-width: 70ch; }
+/* …except in a page that contains a floating image (left, right):
+   CSS cannot know how far down the image goes, and a limit applied
+   paragraph by paragraph would make the text's right edge jump. The whole
+   page then keeps the full width, with a single right edge. */
+:is(.ed-page, .ProseMirror, .container-960px):has(img:is(.ed-left, .ed-right, [src~="float-left"], [src~="float-right"], [src*="%20float-left"], [src*="%20float-right"]))
+  > :is(p, ul, ol, blockquote) { max-width: none; }
+
+small, .meta { font-size: 0.875rem; color: var(--muted); }
+
+a { color: var(--brand); text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+a:hover { color: var(--brand-soft); }
+
+blockquote {
+  margin-left: 0;
+  padding: 0.25em 0 0.25em 1em;
+  border-left: 4px solid var(--rule);
+  color: var(--muted);
+}
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2rem 0; }
+
+code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  background: var(--wash);
+  border-radius: 3px;
+}
+pre { overflow-x: auto; padding: 0.8em 1em; background: var(--wash); border-radius: 4px; }
+pre code { padding: 0; background: none; }
+
+/* Tables (toc.php lists, external databases, Markdown): scroll on phones */
+table { border-collapse: collapse; display: block; max-width: 100%; overflow-x: auto; }
+th, td { padding: 0.4em 0.8em; border: 1px solid var(--rule); vertical-align: top; text-align: left; }
+th { background: var(--wash); font-weight: 600; }
+
+/* Editor tables: full width on large screens (scrolling on phones, section 7) */
+table.ed-table, .ProseMirror table { display: table; width: 100%; table-layout: auto; }
+:is(td, th) > p { margin: 0; }                /* the editor puts cell text in a <p> */
+:is(td, th) > p + p { margin-top: 0.5em; }
+
+/* Callouts (five colours, as in Docmost): side bar, light background, small symbol */
+.ed-callout {
+  --c: var(--brand); --c-bg: var(--wash);
+  position: relative; margin: 1.2em 0; padding: 0.8em 1em 0.8em 2.8em;
+  border-left: 4px solid var(--c); border-radius: 4px; background: var(--c-bg);
+}
+.ed-callout::before {
+  position: absolute; left: 0.85em; top: 0.8em;
+  font-weight: 700; line-height: 1.6; color: var(--c);
+}
+.ed-callout > :first-child { margin-top: 0; }
+.ed-callout > :last-child  { margin-bottom: 0; }
+.ed-callout-info    { --c: light-dark(#2563eb, #7fa9f5); --c-bg: light-dark(#eef4ff, #182336); }
+.ed-callout-note    { --c: light-dark(#7c3aed, #b69cf5); --c-bg: light-dark(#f4f0ff, #241d36); }
+.ed-callout-success { --c: light-dark(#15803d, #6fcf8f); --c-bg: light-dark(#edf8f0, #16281c); }
+.ed-callout-warning { --c: light-dark(#c2410c, #f0a060); --c-bg: light-dark(#fff4ea, #2e2116); }
+.ed-callout-danger  { --c: light-dark(#b91c1c, #f08a8a); --c-bg: light-dark(#fdeeee, #331a1c); }
+.ed-callout-info::before    { content: "\2139\FE0E"; }   /* i  */
+.ed-callout-note::before    { content: "\270E\FE0E"; }   /* pencil */
+.ed-callout-success::before { content: "\2713"; }        /* check mark */
+.ed-callout-warning::before { content: "\26A0\FE0E"; }   /* triangle */
+.ed-callout-danger::before  { content: "\2715"; }        /* cross */
+
+/* Collapsible blocks: native <details>, the browser opens and closes them without JavaScript */
+details.ed-details { margin: 1em 0; padding: 0 1em; border: 1px solid var(--rule); border-radius: 4px; }
+details.ed-details > summary { padding: 0.6em 0; font-weight: 600; color: var(--brand); cursor: pointer; }
+details.ed-details[open] > summary { margin-bottom: 0.6em; border-bottom: 1px solid var(--rule); }
+details.ed-details > div > :last-child { margin-bottom: 0.8em; }
+
+/* Editor's audio player (the controls follow light / dark mode) */
+audio.ed-audio { display: block; width: 100%; max-width: 36rem; margin: 0.5em 0 0.25em; }
+/* Editor's video player (4.7.0): full column width, aspect ratio kept */
+video.ed-video { display: block; width: 100%; height: auto; margin: 0.5em 0 0.25em; background: #000; }
+
+/* Footnotes (Markdown) */
+.footnotes { font-size: 0.9rem; color: var(--muted); }
+
+
+/* --- 4. Grid: half, third, two thirds ---------------------------------- */
+/* Markup produced by the editor and by t_conversion (<x->, <xx->, …):
+   <div class="row"><div class="one-half column">…</div>…</div>          */
+
+.row { display: flex; gap: 0 var(--gap); margin-bottom: 1em; }
+.row > .column { min-width: 0; }                      /* a long word does not break the grid */
+.one-half.column   { flex: 0 0 calc((100% - var(--gap)) / 2); }
+.one-third.column  { flex: 0 0 calc((100% - 2 * var(--gap)) / 3); }
+.two-thirds.column { flex: 0 0 calc((100% - 2 * var(--gap)) / 3 * 2 + var(--gap)); }
+
+
+/* --- 5. Images --------------------------------------------------------- */
+
+img, video { max-width: 100%; height: auto; }
+video { width: 100%; }
+
+/* Editor images: size (small, medium, full width) and position */
+img.ed-img   { display: block; margin: 0.4em 0 1.2em; }
+img.ed-s     { width: 33%; }
+img.ed-m     { width: 60%; }
+img.ed-l     { width: 100%; }
+img.ed-center { margin-left: auto; margin-right: auto; }
+img.ed-block-left  { margin-left: 0;    margin-right: auto; }   /* alone on its line, left */
+img.ed-block-right { margin-left: auto; margin-right: 0; }      /* alone on its line, right */
+img.ed-left  { float: left;  margin-right: 1.5em; }
+img.ed-right { float: right; margin-left: 1.5em; }
+img.ed-l.ed-left, img.ed-l.ed-right { float: none; }
+.column img.ed-s { width: 50%; }
+.column img.ed-m { width: 80%; }
+.ed-page::after { content: ""; display: table; clear: both; }
+.ed-page h2, .ed-page h3, .ed-page h4, .ed-page hr, .ed-page .row { clear: both; }
+
+/* Older CMS Lite conventions (keywords in the image address, after a space:
+   "images/x.png# max320px"). A page that went through the editor keeps the
+   keyword, but with the space written %20 (the correct form in an address):
+   both forms are recognised (4.7.2). */
+img:is([src~="thumbnail"], [src*="%20thumbnail"]) { max-width: 12rem; }
+img:is([src~="max320px"],  [src*="%20max320px"])  { max-width: 20rem; }
+img:is([src~="max480px"],  [src*="%20max480px"])  { max-width: 30rem; }
+img:is([src~="max640px"],  [src*="%20max640px"])  { max-width: 40rem; }
+img:is([src~="center"],    [src*="%20center"])    { display: block; margin-left: auto; margin-right: auto; }
+img:is([src~="float-left"],  [src*="%20float-left"])  { float: left;  margin: 0 1.5em 0.5em 0; }
+img:is([src~="float-right"], [src*="%20float-right"]) { float: right; margin: 0 0 0.5em 1.5em; }
+img:is([src~="bordered"],  [src*="%20bordered"])  { border: 1px solid var(--ink); }
+img:is([src~="shadow"],    [src*="%20shadow"])    { box-shadow: 0 4px 16px rgb(0 0 0 / 0.18); }
+
+
+/* --- 6. Menu (nav.php) -------------------------------------------------- */
+/* Large screen: one line, submenus on hover.
+   Phone: "Menu ☰" button, collapsible submenus (checkboxes). */
+
+nav { max-width: var(--measure); margin: 0 auto; padding: 0 1.25rem; }
+nav input[type="checkbox"] { display: none; }
+nav ul { list-style: none; margin: 0; padding: 0; }
+nav > ul { display: flex; flex-wrap: wrap; gap: 0 0.25rem; }
+nav li { position: relative; margin: 0; }
+nav a, nav .toggle {
+  display: block;
+  padding: 0.5rem 0.9rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--brand);
+  text-decoration: none;
+  cursor: pointer;
+}
+nav a:hover, nav .toggle:hover { background: var(--wash); color: var(--ink); }
+nav .toggle { display: none; }                /* "Menu" button: phones only (section 7).
+                                                 After the rule above, which would show it. */
+
+nav ul ul {                                   /* submenu */
+  display: none;
+  position: absolute; top: 100%; left: 0; z-index: 10;
+  min-width: 12rem;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  box-shadow: 0 6px 16px var(--shadow);
+}
+nav li:hover > ul, nav li:focus-within > ul { display: block; }
+nav ul ul a { font-size: 1rem; }
+
+
+/* --- 7. Phones and small tablets --------------------------------------- */
+
+@media (max-width: 700px) {
+  h1 { font-size: 2.0rem; }                  /* custom.css "small screen" sizes */
+  h2 { font-size: 1.7rem; }
+  h3 { font-size: 1.45rem; }
+  h4 { font-size: 1.25rem; }
+  h5, h6 { font-size: 1.1rem; }
+
+  /* Tables: horizontal scrolling rather than squashing */
+  table.ed-table { display: block; width: auto; overflow-x: auto; }
+
+  /* Stacked columns */
+  .row { display: block; }
+  .row > .column { margin-bottom: 1em; }
+
+  /* Images: no text wrapping, room for the text */
+  img.ed-left, img.ed-right,
+  img:is([src~="float-left"], [src~="float-right"], [src*="%20float-left"], [src*="%20float-right"]) {
+    float: none; display: block; margin-left: auto; margin-right: auto;
+  }
+  img.ed-s { width: 50%; }
+  img.ed-m, .column img.ed-s, .column img.ed-m { width: 100%; }
+
+  /* Menu: "Menu" button, vertical list, collapsible submenus */
+  nav .toggle { display: block; }
+  nav .toggle + a { display: none; }         /* the duplicate submenu link */
+  nav > ul, nav ul ul { display: none; position: static; border: 0; box-shadow: none; min-width: 0; }
+  nav input:checked + ul { display: block; }
+  nav li:hover > ul, nav li:focus-within > ul { display: none; }
+  nav input:checked + ul { display: block; } /* (repeated: must win over the previous line) */
+  nav ul ul a, nav ul ul .toggle { padding-left: 2rem; }
+}
+
+
+/* --- 8. Print ---------------------------------------------------------- */
+
+@media print {
+  nav, .toggle { display: none !important; }
+  /* Collapsible blocks: everything is printed, even when collapsed (recent browsers) */
+  details.ed-details::details-content { content-visibility: visible; block-size: auto; }
+  details.ed-details > summary { list-style: none; border-bottom: 1px solid var(--rule); }
+  .ed-callout { break-inside: avoid; }
+  body { font-size: 11pt; }
+  a { color: inherit; }
+  .row { display: block; }
+}
