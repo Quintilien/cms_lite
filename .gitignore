@@ -20,6 +20,10 @@ public/images/uploads/*
 public/files/*
 !public/files/index.html
 
+# Your own look (stylesheets, images): per installation, never overwritten
+public/theme/*
+!public/theme/index.html
+
 # Activated options (copied from options/, see their README): per installation
 public/doclist.php
 public/display*.php

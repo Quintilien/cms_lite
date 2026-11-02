@@ -340,7 +340,7 @@ The stylesheet is declared in the `HTML_META_CSS` parameter (`t_parameters` tabl
 <link rel="stylesheet" type="text/css" href="css/site.css">
 ```
 
-You can add your own stylesheets there (animations, slideshow, Ken Burns effect…): no themes to install, but a look that is entirely yours. The editor automatically loads the stylesheets declared in `HTML_META_CSS`: its preview therefore follows the choice made for the site. Header, body and footer are set the same way in the `HEADER`, `BODY` and `FOOTER` parameters.
+You can add your own stylesheets there (animations, slideshow, Ken Burns effect…): no themes to install, but a look that is entirely yours. **Keep your own stylesheets and images in `public/theme/`** (for example `theme/mysite.css`, `theme/banner.jpg`): this folder is ignored by Git, so never overwritten by an update, and `git status` stays clean. The editor automatically loads the stylesheets declared in `HTML_META_CSS`: its preview therefore follows the choice made for the site. Header, body and footer are set the same way in the `HEADER`, `BODY` and `FOOTER` parameters.
 
 CMS Lite 3.1's older stylesheets (`style.css`, `nav.css`, `kenburns.css`, `animations.css`) are no longer shipped. A notable difference from `style.css`: it stretched **all** images to the page width, whereas `site.css` shows them at their natural size, never exceeding the available width.
 
@@ -428,6 +428,7 @@ cms_lite/
 │   ├── css/site.css         single stylesheet, and css/fonts/ (Inter)
 │   ├── images/              site images; images/uploads/: images uploaded from the editor
 │   ├── files/               attachments uploaded from the editor
+│   ├── theme/               your own look (stylesheets, images), ignored by Git
 │   └── …                    index.php, page.php, toc.php
 ├── options/                 OUTSIDE the site until copied (see "Options")
 │   ├── web-documents-browser/   doclist.php, display*.php, demo documents

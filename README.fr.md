@@ -340,7 +340,7 @@ La feuille est déclarée dans le paramètre `HTML_META_CSS` (table `t_parameter
 <link rel="stylesheet" type="text/css" href="css/site.css">
 ```
 
-On peut y ajouter ses propres feuilles (animations, diaporama, effet Ken Burns…) : pas de thèmes à installer, mais une apparence entièrement libre. L'éditeur charge automatiquement les feuilles déclarées dans `HTML_META_CSS` : son aperçu suit donc le choix fait pour le site. L'en-tête, le corps et le pied de page se règlent de même dans les paramètres `HEADER`, `BODY` et `FOOTER`.
+On peut y ajouter ses propres feuilles (animations, diaporama, effet Ken Burns…) : pas de thèmes à installer, mais une apparence entièrement libre. **Rangez vos feuilles et vos images d'habillage dans `public/theme/`** (par exemple `theme/monsite.css`, `theme/bandeau.jpg`) : ce dossier est ignoré par Git, donc jamais écrasé par une mise à jour, et `git status` reste propre. L'éditeur charge automatiquement les feuilles déclarées dans `HTML_META_CSS` : son aperçu suit donc le choix fait pour le site. L'en-tête, le corps et le pied de page se règlent de même dans les paramètres `HEADER`, `BODY` et `FOOTER`.
 
 Les anciennes feuilles de CMS Lite 3.1 (`style.css`, `nav.css`, `kenburns.css`, `animations.css`) ne sont plus livrées. Différence notable avec `style.css` : celui-ci étirait **toutes** les images à la largeur de la page, alors que `site.css` les affiche à leur taille naturelle, sans jamais dépasser la largeur disponible.
 
@@ -428,6 +428,7 @@ cms_lite/
 │   ├── css/site.css         feuille de style unique, et css/fonts/ (Inter)
 │   ├── images/              images du site ; images/uploads/ : images envoyées depuis l'éditeur
 │   ├── files/               pièces jointes envoyées depuis l'éditeur
+│   ├── theme/               votre habillage (feuilles, images), ignoré par Git
 │   └── …                    index.php, page.php, toc.php
 ├── options/                 HORS du site tant qu'on ne les copie pas (voir « Options »)
 │   ├── web-documents-browser/   doclist.php, display*.php, documents de démonstration
