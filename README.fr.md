@@ -126,7 +126,7 @@ Deux conteneurs, de la même image :
    cp data/cms_lite_demo.db data/cms_lite.db        # ou une base vierge, ou une base existante
    ```
    Dans `config/config.ini` : `db = ../data/cms_lite.db`. Les deux conteneurs utilisent la base désignée par ce fichier.
-3. Vérifier que les ports sont libres : `ss -ltn | grep -E ':809[01]\b'` (aucune réponse = libres). Sinon, les changer dans `compose.yml` *et* dans le Caddyfile.
+3. Vérifier que les ports sont libres : `ss -ltn | grep -E ':809[01]\b'` (aucune réponse = libres). Sinon, les changer dans `compose.yml` *et* dans le Caddyfile. **Deuxième site CMS Lite sur le même serveur** : changer aussi les deux `container_name` de `compose.yml` (par exemple `monsite_public` et `monsite_admin`), qui doivent être uniques sur la machine, en plus des ports.
 4. Droits d'écriture partagés. Deux comptes écrivent dans `data/`, `public/images/uploads/` et `public/files/` : le vôtre (pour `git pull`) et Apache (`www-data`, uid **33**, pour l'éditeur). On donne donc ces répertoires au groupe `www-data`, en écriture pour le groupe. Le **répertoire** `data/` doit lui-même être accessible en écriture, car SQLite y crée son journal pendant chaque écriture :
    ```sh
    sudo chgrp -R www-data data public/images/uploads public/files
@@ -247,14 +247,21 @@ curl -s -o /dev/null -w '%{http_code}\n' https://…/admin/
 curl -s -o /dev/null -w '%{http_code}\n' -X POST 'https://…/admin/api.php?action=save'
 ```
 
+En **mode 3**, l'éditeur est à la racine de son propre nom (par exemple `admin.example.org`), sans `/admin/` :
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' https://admin.example.org/
+curl -s -o /dev/null -w '%{http_code}\n' -X POST 'https://admin.example.org/api.php?action=save'
+```
+
 | Code obtenu | Signification |
 |---|---|
-| `401` | Protégé (authentification Basic) ✔ |
+| `401` | Protégé : authentification Basic, ou forward-auth qui répond 401 à un client autre qu'un navigateur (Tinyauth, par exemple) ✔ |
 | `302` ou `303` | Protégé : renvoi vers la page de connexion du forward-auth ✔ |
 | `200` sur la première commande | **Non protégé** : la liste des pages est visible ✘ |
 | `403` sur la seconde commande | **Non protégé** : la requête a atteint `api.php`, qui ne l'a refusée que par son contrôle d'origine. Un robot mieux déguisé passerait ✘ |
 
-Les deux commandes doivent donner `401` ou `302`/`303`. Si ce n'est pas le cas, la protection ne couvre pas tout le répertoire.
+Les deux commandes doivent donner `401` ou `302`/`303`. Si ce n'est pas le cas, la protection ne couvre pas tout le répertoire (ou tout le nom, en mode 3).
 
 ### En local
 

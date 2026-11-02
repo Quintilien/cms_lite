@@ -126,7 +126,7 @@ Two containers, from the same image:
    cp data/cms_lite_demo.db data/cms_lite.db        # or an empty database, or an existing one
    ```
    In `config/config.ini`: `db = ../data/cms_lite.db`. Both containers use the database named in this file.
-3. Check that the ports are free: `ss -ltn | grep -E ':809[01]\b'` (no output = free). Otherwise, change them in `compose.yml` *and* in the Caddyfile.
+3. Check that the ports are free: `ss -ltn | grep -E ':809[01]\b'` (no output = free). Otherwise, change them in `compose.yml` *and* in the Caddyfile. **Second CMS Lite site on the same server**: also change the two `container_name` entries in `compose.yml` (for example `mysite_public` and `mysite_admin`), which must be unique on the machine, as well as the ports.
 4. Shared write permissions. Two accounts write to `data/`, `public/images/uploads/` and `public/files/`: yours (for `git pull`) and Apache (`www-data`, uid **33**, for the editor). These directories are therefore given to the `www-data` group, writable by the group. The `data/` **directory** itself must be writable, because SQLite creates its journal there during each write:
    ```sh
    sudo chgrp -R www-data data public/images/uploads public/files
@@ -247,14 +247,21 @@ curl -s -o /dev/null -w '%{http_code}\n' https://…/admin/
 curl -s -o /dev/null -w '%{http_code}\n' -X POST 'https://…/admin/api.php?action=save'
 ```
 
+In **mode 3**, the editor is at the root of its own name (for example `admin.example.org`), without `/admin/`:
+
+```sh
+curl -s -o /dev/null -w '%{http_code}\n' https://admin.example.org/
+curl -s -o /dev/null -w '%{http_code}\n' -X POST 'https://admin.example.org/api.php?action=save'
+```
+
 | Code returned | Meaning |
 |---|---|
-| `401` | Protected (Basic authentication) ✔ |
+| `401` | Protected: Basic authentication, or a forward-auth that answers 401 to a non-browser client (Tinyauth, for example) ✔ |
 | `302` or `303` | Protected: redirect to the forward-auth login page ✔ |
 | `200` on the first command | **Not protected**: the page list is visible ✘ |
 | `403` on the second command | **Not protected**: the request reached `api.php`, which only refused it through its origin check. A better-disguised bot would get through ✘ |
 
-Both commands must return `401` or `302`/`303`. If not, the protection does not cover the whole directory.
+Both commands must return `401` or `302`/`303`. If not, the protection does not cover the whole directory (or the whole name, in mode 3).
 
 ### Locally
 
