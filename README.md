@@ -125,6 +125,7 @@ Two containers, from the same image:
    cp config/config.ini.example config/config.ini   # then set the db key
    cp data/cms_lite_demo.db data/cms_lite.db        # or an empty database, or an existing one
    ```
+   For a new site rather than the demo: `sqlite3 data/cms_lite.db < init/empty_database.sql` (blank database, two pages; without `sqlite3`: `sudo apt install sqlite3`).
    In `config/config.ini`: `db = ../data/cms_lite.db`. Both containers use the database named in this file.
 3. Check that the ports are free: `ss -ltn | grep -E ':809[01]\b'` (no output = free). Otherwise, change them in `compose.yml` *and* in the Caddyfile. **Second CMS Lite site on the same server**: also change the two `container_name` entries in `compose.yml` (for example `mysite_public` and `mysite_admin`), which must be unique on the machine, as well as the ports.
 4. Shared write permissions. Two accounts write to `data/`, `public/images/uploads/` and `public/files/`: yours (for `git pull`) and Apache (`www-data`, uid **33**, for the editor). These directories are therefore given to the `www-data` group, writable by the group. The `data/` **directory** itself must be writable, because SQLite creates its journal there during each write:
