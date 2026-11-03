@@ -12,7 +12,7 @@ const HTML_MARKER = '<!--html-->';
 // repository root) instead of being read from VERSION: with Docker, that file was
 // mounted on its own in the container, and a "git pull" replacing it was only
 // seen after a restart. admin/ is mounted as a directory, so this follows the pull.
-const CMS_VERSION = '4.7.2';
+const CMS_VERSION = '4.7.3';
 function cms_version(): string {
     return CMS_VERSION;
 }
@@ -79,6 +79,10 @@ if (!headers_sent()) {
     header("Content-Security-Policy: frame-ancestors 'none'");
     header('Referrer-Policy: same-origin');
 }
+// Editor session lifetime without any request (4.7.3, see admin_session_dir()).
+// Defined here: the session starts just below.
+const SESSION_LIFETIME = 8 * 3600;   // 8 hours
+
 // Editor session and anti-CSRF token: before any output (4.5.1). In 4.5.0 the
 // session started in the middle of the page; without output buffering (the
 // Docker image), PHP refused it and the token stayed empty.
@@ -246,10 +250,34 @@ function require_same_origin(): void {
 // of every call to api.php. The session is closed at once (no lock during
 // file uploads).
 // ---------------------------------------------------------------------------
+// Editor sessions in their own folder (4.7.3): data/sessions/, next to the
+// database, outside the web root. On shared hosting, PHP's default folder is
+// often /tmp, emptied by the host on its own schedule whatever
+// session.gc_maxlifetime says (OVH: save_path = /tmp, gc_probability = 0, so
+// PHP never cleans up itself and the host's task decides). A long editing
+// session could then lose its anti-CSRF token, and saving was refused.
+// In its own folder, CMS Lite decides: a session lasts SESSION_LIFETIME without
+// any request (every call to the editor refreshes it), and PHP's clean-up runs
+// on this folder only. If the folder cannot be created or written, the editor
+// keeps PHP's default folder, as before 4.7.3. SESSION_LIFETIME is defined
+// near the top of this file, before the session is started.
+function admin_session_dir(): ?string {
+    $dir = dirname(CMS_DB) . '/sessions';
+    if (!is_dir($dir) && !@mkdir($dir, 0700)) return null;
+    return is_writable($dir) ? $dir : null;
+}
+
 function admin_session_start(): void {
     if (session_status() === PHP_SESSION_ACTIVE) return;
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
           || strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+    $dir = admin_session_dir();
+    if ($dir !== null) {
+        session_save_path($dir);
+        ini_set('session.gc_maxlifetime', (string)SESSION_LIFETIME);
+        ini_set('session.gc_probability', '1');
+        ini_set('session.gc_divisor', '100');
+    }
     session_name('cms_lite_admin');
     session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => $https,
                                'httponly' => true, 'samesite' => 'Strict']);

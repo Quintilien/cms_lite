@@ -76,7 +76,7 @@
 #
 */
 
-$current_rev = 'CMS_Lite version 4.7.2 (2026-11-02)' ;   // Rev. 4.5.0: no longer shown on the site (?rev removed)
+$current_rev = 'CMS_Lite version 4.7.3 (2026-11-03)' ;   // Rev. 4.5.0: no longer shown on the site (?rev removed)
 
 // config.ini is a local file containing path and SQLite database filename 
 $db = '';

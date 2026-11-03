@@ -4,6 +4,14 @@
 
 Numérotation **majeure.mineure.correction** : le dernier chiffre change pour une correction, le deuxième pour de nouvelles fonctions, le premier pour une refonte. Les noms de fichiers et de sections cités sont ceux de chaque version.
 
+**4.7.3** (3 novembre 2026)
+
+- Éditeur : les sessions (et donc le jeton anti-CSRF) sont rangées dans `data/sessions/`, à côté de la base, hors de la racine web, et durent 8 heures sans activité. Jusqu'ici, elles restaient dans le dossier par défaut de PHP, souvent `/tmp` sur un hébergement mutualisé, que l'hébergeur vide selon ses propres règles, quel que soit `session.gc_maxlifetime` (OVH : `session.gc_probability = 0`, le ménage est fait par une tâche du serveur). Après une longue rédaction, l'enregistrement pouvait être refusé. Le dossier est créé au premier passage ; s'il ne peut pas l'être, l'éditeur garde le dossier par défaut, comme avant.
+- `admin/htaccess.example` : comment trouver le chemin absolu à indiquer dans `AuthUserFile` sur un hébergement mutualisé.
+- Mise à jour depuis une version 3.x : supprimer aussi l'ancien `scandir.php`, s'il est resté dans `www/`. Il appartient à la même famille que les scripts corrigés en 4.3.2 (paramètre recopié dans la page sans échappement) et ne fonctionne plus depuis la 4.4.0.
+
+Mettre à jour : `git pull` (mode 3) ; sinon, téléverser `admin/` et `src/`. `data/` doit être accessible en écriture par PHP, ce qui est déjà le cas puisque l'éditeur y écrit la base.
+
 **4.7.2** (2 novembre 2026)
 
 - Site : les mots-clés de taille et de position des images hérités de CMS Lite 3 (`images/x.png# max320px`, `thumbnail`, `center`, `float-left`…) restent actifs sur une page passée par l'éditeur. L'éditeur écrit l'espace qui précède le mot-clé sous la forme `%20`, la forme correcte dans une adresse, et `site.css` ne reconnaissait que l'espace : l'image reprenait alors toute la largeur. Les deux formes sont reconnues.

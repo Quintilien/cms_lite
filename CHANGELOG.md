@@ -4,6 +4,14 @@
 
 Numbering **major.minor.patch**: the last number changes for a fix, the second for new features, the first for a redesign. File and section names are those of each version.
 
+**4.7.3** (3 November 2026)
+
+- Editor: sessions (and therefore the anti-CSRF token) are kept in `data/sessions/`, next to the database, outside the web root, and last 8 hours without activity. Until now they stayed in PHP's default folder, often `/tmp` on shared hosting, which the host empties by its own rules whatever `session.gc_maxlifetime` says (OVH: `session.gc_probability = 0`, the clean-up is done by a server task). After a long editing session, saving could be refused. The folder is created on first use; if it cannot be, the editor keeps the default folder, as before.
+- `admin/htaccess.example`: how to find the absolute path for `AuthUserFile` on shared hosting.
+- Updating from a 3.x version: also delete the old `scandir.php` if it is still in `www/`. It belongs to the same family as the scripts fixed in 4.3.2 (parameter copied into the page without escaping) and has not worked since 4.4.0.
+
+Updating: `git pull` (mode 3); otherwise, upload `admin/` and `src/`. `data/` must be writable by PHP, which is already the case since the editor writes the database there.
+
 **4.7.2** (2 November 2026)
 
 - Site: the image size and position keywords inherited from CMS Lite 3 (`images/x.png# max320px`, `thumbnail`, `center`, `float-left`…) keep working on a page that went through the editor. The editor writes the space before the keyword as `%20`, the correct form in an address, and `site.css` only recognised the space: the image then took the full width. Both forms are recognised.

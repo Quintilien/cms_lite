@@ -4,6 +4,8 @@
 #       htpasswd -c -B /home/LOGIN/.htpasswd-admin secretaire
 #    (or an online bcrypt generator if there is no SSH access)
 # 3. Adjust AuthUserFile below (absolute path on the server).
+#    To find it: create www/where.php containing  <?php echo __DIR__;
+#    open it in the browser, note the path, then DELETE where.php at once.
 # HTTPS only: over HTTP, the password travels in clear text.
 
 AuthType Basic

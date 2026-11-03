@@ -365,7 +365,7 @@ As soon as the editor is online, the server's database becomes the reference: do
 
 ## Backup
 
-The database (`data/cms_lite.db`), `config/config.ini`, `public/images/uploads/` and `public/files/`, nothing else. To copy the database safely while the editor is running:
+The database (`data/cms_lite.db`), `config/config.ini`, `public/images/uploads/` and `public/files/`, nothing else (`data/sessions/`, the editor's sessions since 4.7.3, needs no backup). To copy the database safely while the editor is running:
 
 ```sh
 sqlite3 data/cms_lite.db ".backup '/path/backup/cms_lite-$(date +%F).db'"

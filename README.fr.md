@@ -365,7 +365,7 @@ Dès que l'éditeur est en ligne, la base du serveur devient la référence : on
 
 ## Sauvegarde
 
-La base (`data/cms_lite.db`), `config/config.ini`, `public/images/uploads/` et `public/files/`, rien d'autre. Pour copier la base sans risque pendant que l'éditeur tourne :
+La base (`data/cms_lite.db`), `config/config.ini`, `public/images/uploads/` et `public/files/`, rien d'autre (`data/sessions/`, les sessions de l'éditeur depuis la 4.7.3, n'a pas à être sauvegardé). Pour copier la base sans risque pendant que l'éditeur tourne :
 
 ```sh
 sqlite3 data/cms_lite.db ".backup '/chemin/sauvegarde/cms_lite-$(date +%F).db'"
