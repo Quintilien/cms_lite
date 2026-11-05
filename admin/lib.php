@@ -12,7 +12,7 @@ const HTML_MARKER = '<!--html-->';
 // repository root) instead of being read from VERSION: with Docker, that file was
 // mounted on its own in the container, and a "git pull" replacing it was only
 // seen after a restart. admin/ is mounted as a directory, so this follows the pull.
-const CMS_VERSION = '4.7.3';
+const CMS_VERSION = '4.7.4';
 function cms_version(): string {
     return CMS_VERSION;
 }

@@ -1,15 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-declare(strict_types=1);
-
 namespace Nette\Utils;
 
 use Nette;
+use function array_key_exists, gettype, is_float, is_int, is_object, is_string, strlen;
 
 
 /**
@@ -145,6 +144,7 @@ class Validators
 				}
 
 				continue;
+
 			} elseif (str_starts_with($item, '?')) {
 				$item = substr($item, 1);
 				if ($value === null) {
@@ -158,7 +158,7 @@ class Validators
 					if (!static::$validators[$type]($value)) {
 						continue;
 					}
-				} catch (\TypeError $e) {
+				} catch (\TypeError) {
 					continue;
 				}
 			} elseif ($type === 'pattern') {
@@ -167,6 +167,7 @@ class Validators
 				}
 
 				continue;
+
 			} elseif (!$value instanceof $type) {
 				continue;
 			}

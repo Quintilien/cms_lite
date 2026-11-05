@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-declare(strict_types=1);
-
 namespace Nette\Utils;
 
 use Nette;
+use function ord;
+use const PHP_VERSION_ID;
 
 
 /**
@@ -19,21 +19,20 @@ final class Reflection
 {
 	use Nette\StaticClass;
 
-	/** @deprecated use Nette\Utils\Validator::isBuiltinType() */
+	/** @deprecated use Nette\Utils\Validators::isBuiltinType() */
 	public static function isBuiltinType(string $type): bool
 	{
 		return Validators::isBuiltinType($type);
 	}
 
 
-	/** @deprecated use Nette\Utils\Validator::isClassKeyword() */
+	/** @deprecated use Nette\Utils\Validators::isClassKeyword() */
 	public static function isClassKeyword(string $name): bool
 	{
 		return Validators::isClassKeyword($name);
 	}
 
 
-	/** @deprecated use native ReflectionParameter::getDefaultValue() */
 	public static function getParameterDefaultValue(\ReflectionParameter $param): mixed
 	{
 		if ($param->isDefaultValueConstant()) {
@@ -240,9 +239,7 @@ final class Reflection
 				case T_CLASS:
 				case T_INTERFACE:
 				case T_TRAIT:
-				case PHP_VERSION_ID < 80100
-					? T_CLASS
-					: T_ENUM:
+				case PHP_VERSION_ID < 80100 ? T_CLASS : T_ENUM:
 					if ($name = self::fetch($tokens, T_STRING)) {
 						$class = $namespace . $name;
 						$classLevel = $level + 1;

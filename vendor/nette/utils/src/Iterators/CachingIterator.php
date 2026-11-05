@@ -1,11 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
-
-declare(strict_types=1);
 
 namespace Nette\Iterators;
 
@@ -34,7 +32,7 @@ class CachingIterator extends \CachingIterator implements \Countable
 	public function __construct(iterable|\stdClass $iterable)
 	{
 		$iterable = $iterable instanceof \stdClass
-			? new \ArrayIterator($iterable)
+			? new \ArrayIterator((array) $iterable)
 			: Nette\Utils\Iterables::toIterator($iterable);
 		parent::__construct($iterable, 0);
 	}

@@ -1,15 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-declare(strict_types=1);
-
 namespace Nette\Utils;
 
 use Nette;
+use function count, func_get_args, func_num_args, is_array, sprintf;
+use const GLOB_NOESCAPE, GLOB_NOSORT, GLOB_ONLYDIR;
 
 
 /**
@@ -299,7 +299,7 @@ class Finder implements \IteratorAggregate
 			$operator = $operator ?: '=';
 		}
 
-		$date = DateTime::from($date)->format('U');
+		$date = DateTime::from($date)->getTimestamp();
 		return $this->filter(fn(FileInfo $file): bool => !$file->isFile() || Helpers::compare($file->getMTime(), $operator, $date));
 	}
 
@@ -350,7 +350,13 @@ class Finder implements \IteratorAggregate
 		}
 
 		try {
-			$pathNames = new \FilesystemIterator($dir, \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::UNIX_PATHS);
+			$pathNames = new \FilesystemIterator(
+				$dir,
+				\FilesystemIterator::FOLLOW_SYMLINKS
+				| \FilesystemIterator::SKIP_DOTS
+				| \FilesystemIterator::CURRENT_AS_PATHNAME
+				| \FilesystemIterator::UNIX_PATHS,
+			);
 		} catch (\UnexpectedValueException $e) {
 			if ($this->ignoreUnreadableDirs) {
 				return;
@@ -385,7 +391,7 @@ class Finder implements \IteratorAggregate
 			$relativePathname = FileSystem::unixSlashes($file->getRelativePathname());
 			foreach ($searches as $search) {
 				if (
-					$file->{'is' . $search->mode}()
+					"is_$search->mode"(Helpers::IsWindows && $file->isLink() ? $file->getLinkTarget() : $file->getPathname())
 					&& preg_match($search->pattern, $relativePathname)
 					&& $this->proveFilters($this->filters, $file, $cache)
 				) {
@@ -505,6 +511,6 @@ class Finder implements \IteratorAggregate
 				'\-' => '-',
 			],
 		);
-		return '#' . $anchor . $pattern . '$#D' . (defined('PHP_WINDOWS_VERSION_BUILD') ? 'i' : '');
+		return '#' . $anchor . $pattern . '$#D' . (Helpers::IsWindows ? 'i' : '');
 	}
 }

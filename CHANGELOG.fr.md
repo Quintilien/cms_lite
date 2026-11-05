@@ -4,6 +4,13 @@
 
 Numérotation **majeure.mineure.correction** : le dernier chiffre change pour une correction, le deuxième pour de nouvelles fonctions, le premier pour une refonte. Les noms de fichiers et de sections cités sont ceux de chaque version.
 
+**4.7.4** (5 novembre 2026)
+
+- `vendor/` : league/commonmark passe de 2.5.3 à 2.10.7, qui corrige les avis de sécurité publiés pour les versions précédentes (surtout des dénis de service sur du Markdown piégé). Elle ne sert qu'aux pages au format classique (Markdown) ; les pages de la démo s'affichent exactement comme avant.
+- `vendor/` reconstruit à partir des paquets officiels ; `composer.json` ne déclare plus `michelf/php-markdown`, que le code n'utilisait pas et qui n'était pas installé. Les versions exactes se vérifient avec `composer audit`.
+
+Mettre à jour : `git pull` (mode 3) ; sinon, téléverser `vendor/`.
+
 **4.7.3** (3 novembre 2026)
 
 - Éditeur : les sessions (et donc le jeton anti-CSRF) sont rangées dans `data/sessions/`, à côté de la base, hors de la racine web, et durent 8 heures sans activité. Jusqu'ici, elles restaient dans le dossier par défaut de PHP, souvent `/tmp` sur un hébergement mutualisé, que l'hébergeur vide selon ses propres règles, quel que soit `session.gc_maxlifetime` (OVH : `session.gc_probability = 0`, le ménage est fait par une tâche du serveur). Après une longue rédaction, l'enregistrement pouvait être refusé. Le dossier est créé au premier passage ; s'il ne peut pas l'être, l'éditeur garde le dossier par défaut, comme avant.

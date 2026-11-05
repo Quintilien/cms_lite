@@ -4,6 +4,13 @@
 
 Numbering **major.minor.patch**: the last number changes for a fix, the second for new features, the first for a redesign. File and section names are those of each version.
 
+**4.7.4** (5 November 2026)
+
+- `vendor/`: league/commonmark updated from 2.5.3 to 2.10.7, which fixes the security advisories published for earlier versions (mostly denial of service on crafted Markdown). It is only used for pages in the classic (Markdown) format; the demo pages render exactly as before.
+- `vendor/` rebuilt from the official packages; `composer.json` no longer declares `michelf/php-markdown`, which the code did not use and which was not installed. The exact versions can be checked with `composer audit`.
+
+Updating: `git pull` (mode 3); otherwise upload `vendor/`.
+
 **4.7.3** (3 November 2026)
 
 - Editor: sessions (and therefore the anti-CSRF token) are kept in `data/sessions/`, next to the database, outside the web root, and last 8 hours without activity. Until now they stayed in PHP's default folder, often `/tmp` on shared hosting, which the host empties by its own rules whatever `session.gc_maxlifetime` says (OVH: `session.gc_probability = 0`, the clean-up is done by a server task). After a long editing session, saving could be refused. The folder is created on first use; if it cannot be, the editor keeps the default folder, as before.

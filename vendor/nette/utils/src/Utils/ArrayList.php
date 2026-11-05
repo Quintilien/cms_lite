@@ -1,15 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-declare(strict_types=1);
-
 namespace Nette\Utils;
 
 use Nette;
+use function count, is_int;
 
 
 /**
@@ -63,7 +62,7 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Replaces or appends a item.
+	 * Replaces or appends an item.
 	 * @param  int|null  $index
 	 * @param  T  $value
 	 * @throws Nette\OutOfRangeException
@@ -83,7 +82,7 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Returns a item.
+	 * Returns an item.
 	 * @param  int  $index
 	 * @return T
 	 * @throws Nette\OutOfRangeException
@@ -99,7 +98,7 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Determines whether a item exists.
+	 * Determines whether an item exists.
 	 * @param  int  $index
 	 */
 	public function offsetExists($index): bool
@@ -124,7 +123,7 @@ class ArrayList implements \ArrayAccess, \Countable, \IteratorAggregate
 
 
 	/**
-	 * Prepends a item.
+	 * Prepends an item.
 	 * @param  T  $value
 	 */
 	public function prepend(mixed $value): void

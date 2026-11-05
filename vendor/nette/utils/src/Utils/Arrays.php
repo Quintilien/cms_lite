@@ -1,17 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
-declare(strict_types=1);
-
 namespace Nette\Utils;
 
 use JetBrains\PhpStorm\Language;
 use Nette;
-use function is_array, is_int, is_object, count;
+use function array_key_exists, count, func_num_args, is_array, is_int, is_object;
+use const PHP_VERSION_ID, PREG_SPLIT_DELIM_CAPTURE, PREG_SPLIT_NO_EMPTY;
 
 
 /**
@@ -121,7 +120,7 @@ class Arrays
 
 
 	/**
-	 * Returns the first item (matching the specified predicate if given). If there is no such item, it returns result of invoking $else or null.
+	 * Returns the first item (matching the predicate if given). If there is no such item, returns the result of $else or null.
 	 * @template K of int|string
 	 * @template V
 	 * @param  array<K, V>  $array
@@ -138,7 +137,7 @@ class Arrays
 
 
 	/**
-	 * Returns the last item (matching the specified predicate if given). If there is no such item, it returns result of invoking $else or null.
+	 * Returns the last item (matching the predicate if given). If there is no such item, returns the result of $else or null.
 	 * @template K of int|string
 	 * @template V
 	 * @param  array<K, V>  $array
@@ -277,9 +276,10 @@ class Arrays
 	 */
 	public static function isList(mixed $value): bool
 	{
-		return is_array($value) && (PHP_VERSION_ID < 80100
-			? !$value || array_keys($value) === range(0, count($value) - 1)
-			: array_is_list($value)
+		return is_array($value) && (
+			PHP_VERSION_ID < 80100
+				? !$value || array_keys($value) === range(0, count($value) - 1)
+				: array_is_list($value)
 		);
 	}
 
@@ -321,6 +321,7 @@ class Arrays
 						}
 
 						$x = &$x->{$row[$parts[$i]]};
+
 					} else {
 						$row = is_object($rowOrig) ? $rowOrig : (object) $row;
 					}
@@ -531,7 +532,7 @@ class Arrays
 	 */
 	public static function toKey(mixed $value): int|string
 	{
-		return key([$value => null]);
+		return key(@[$value => null]); // @ null as an array offset is deprecated in PHP 8.5
 	}
 
 
